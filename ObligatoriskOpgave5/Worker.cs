@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using ModelLib;
+using Newtonsoft.Json;
 
 namespace ObligatoriskOpgave5
 {
@@ -47,28 +48,37 @@ namespace ObligatoriskOpgave5
             using (StreamReader sr = new StreamReader(socket.GetStream()))
             using (StreamWriter sw = new StreamWriter(socket.GetStream()))
             {
-                while (true)
+                bool isRunning = true;
+                while (isRunning)
                 {
                     string str = sr.ReadLine();
-                    sw.WriteLine(str);
+                    string str2;
+                    string returnstr = null;
+                    switch (str.ToLower())
+                    {
+                        case "hentalle":
+                            returnstr = JsonConvert.SerializeObject(BogList);
+                            break;
+                        case "hent":
+                            str2 = sr.ReadLine();
+                            Bog bog = BogList.Find(b => b.Isbn == str2);
+                            returnstr = JsonConvert.SerializeObject(bog);
+                            break;
+                        case "gem":
+                            str2 = sr.ReadLine();
+                            Bog bog1 = JsonConvert.DeserializeObject<Bog>(str2);
+                            BogList.Add(bog1);
+                            break;
+                        case "stop":
+                            isRunning = false;
+                            break;
+                    }
+                    sw.WriteLine(returnstr);
                     sw.Flush();
                 }
             }
         }
 
-        private void Get(string isbn)
-        {
 
-        }
-
-        private void GetAll(string isbn)
-        {
-
-        }
-
-        private void Put()
-        {
-
-        }
     }
 }
